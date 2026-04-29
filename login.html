@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Entrar | InfluencerPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7C3AED;
+      --purple-light: #A855F7;
+      --pink: #EC4899;
+      --green: #10B981;
+      --red: #EF4444;
+      --dark: #0F0A1E;
+      --dark2: #1A1035;
+      --dark3: #241848;
+      --white: #FFFFFF;
+      --gray: #9CA3AF;
+      --gray2: #6B7280;
+      --border: rgba(255,255,255,0.1);
+      --gradient: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ─── BG GLOW ─── */
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 20%, rgba(124,58,237,.25) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(236,72,153,.18) 0%, transparent 60%);
+    }
+    .bg-dots {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ─── WRAPPER ─── */
+    .page-wrapper {
+      position: relative; z-index: 1;
+      width: 100%; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(124,58,237,.25);
+      border-radius: 28px;
+      padding: 48px 44px;
+      width: 100%; max-width: 460px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.04) inset;
+      animation: fadeIn .5s ease both;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ─── LOGO ─── */
+    .logo {
+      text-align: center; margin-bottom: 32px;
+    }
+    .logo a {
+      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.4rem;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+    .logo p {
+      color: var(--gray); font-size: .85rem; margin-top: 6px;
+    }
+
+    /* ─── TABS ─── */
+    .tabs {
+      display: flex; background: rgba(255,255,255,.05);
+      border-radius: 14px; padding: 4px; margin-bottom: 32px;
+    }
+    .tab-btn {
+      flex: 1; padding: 10px; border: none; background: transparent;
+      color: var(--gray); font-family: 'Poppins', sans-serif; font-weight: 600;
+      font-size: .9rem; cursor: pointer; border-radius: 10px; transition: all .25s;
+    }
+    .tab-btn.active {
+      background: var(--gradient); color: #fff;
+      box-shadow: 0 4px 16px rgba(124,58,237,.4);
+    }
+
+    /* ─── SOCIAL LOGIN ─── */
+    .social-btns { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .social-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 13px 20px; border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.04); color: #fff;
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: .92rem;
+      cursor: pointer; transition: all .25s; text-decoration: none;
+    }
+    .social-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); transform: translateY(-1px); }
+    .social-btn img { width: 20px; height: 20px; }
+    .social-btn .icon { font-size: 1.1rem; }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider span { color: var(--gray2); font-size: .8rem; white-space: nowrap; }
+
+    /* ─── FORM ─── */
+    .form { display: flex; flex-direction: column; gap: 18px; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field label {
+      font-size: .82rem; font-weight: 600; color: #D1D5DB; letter-spacing: .3px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap .input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: var(--gray2); pointer-events: none;
+    }
+    .input-wrap .toggle-pwd {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--gray2); cursor: pointer;
+      font-size: 1rem; padding: 0; transition: color .2s;
+    }
+    .input-wrap .toggle-pwd:hover { color: var(--purple-light); }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%; padding: 13px 14px 13px 42px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 12px; color: #fff;
+      font-family: 'Inter', sans-serif; font-size: .95rem;
+      transition: border-color .25s, box-shadow .25s;
+      outline: none;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(124,58,237,.2);
+      background: rgba(124,58,237,.06);
+    }
+    input::placeholder { color: var(--gray2); }
+    input.error { border-color: var(--red); }
+    input.error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.2); }
+
+    .field-hint {
+      font-size: .75rem; color: var(--red); display: none; margin-top: 2px;
+    }
+    .field-hint.visible { display: block; }
+
+    /* ─── STRENGTH BAR ─── */
+    .strength-wrap { margin-top: 8px; }
+    .strength-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+    .bar { height: 4px; flex: 1; border-radius: 2px; background: rgba(255,255,255,.1); transition: background .3s; }
+    .bar.weak   { background: #EF4444; }
+    .bar.medium { background: #FBBF24; }
+    .bar.strong { background: #10B981; }
+    .strength-label { font-size: .72rem; color: var(--gray2); }
+
+    /* ─── PASSWORD RULES ─── */
+    .pwd-rules { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+    .pwd-rules li {
+      font-size: .76rem; color: var(--gray2);
+      display: flex; align-items: center; gap: 6px; transition: color .2s;
+    }
+    .pwd-rules li .rule-icon { font-size: .7rem; }
+    .pwd-rules li.ok { color: var(--green); }
+    .pwd-rules li.ok .rule-icon::before { content: '✓'; }
+    .pwd-rules li:not(.ok) .rule-icon::before { content: '○'; }
+
+    /* ─── EXTRAS ─── */
+    .extras {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 4px;
+    }
+    .checkbox-label {
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+      font-size: .83rem; color: var(--gray); user-select: none;
+    }
+    input[type="checkbox"] {
+      width: 16px; height: 16px; accent-color: var(--purple); cursor: pointer;
+      border-radius: 4px;
+    }
+    .forgot-link {
+      font-size: .83rem; color: var(--purple-light); text-decoration: none; font-weight: 600;
+      transition: color .2s;
+    }
+    .forgot-link:hover { color: var(--pink); }
+
+    /* ─── SUBMIT BTN ─── */
+    .btn-submit {
+      width: 100%; padding: 15px;
+      background: var(--gradient); color: #fff; border: none;
+      border-radius: 12px; font-family: 'Poppins', sans-serif;
+      font-weight: 700; font-size: 1rem; cursor: pointer;
+      box-shadow: 0 6px 24px rgba(124,58,237,.4);
+      transition: transform .2s, box-shadow .2s;
+      position: relative; overflow: hidden;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(124,58,237,.6); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit .spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+      border-radius: 50%; animation: spin .7s linear infinite;
+      margin: 0 auto;
+    }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── TERMS ─── */
+    .terms-text {
+      font-size: .75rem; color: var(--gray2); text-align: center; line-height: 1.5;
+      margin-top: 16px;
+    }
+    .terms-text a { color: var(--purple-light); text-decoration: none; }
+    .terms-text a:hover { text-decoration: underline; }
+
+    /* ─── SWITCH TAB TEXT ─── */
+    .switch-text {
+      text-align: center; margin-top: 24px;
+      font-size: .85rem; color: var(--gray2);
+    }
+    .switch-text a {
+      color: var(--purple-light); font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+    .switch-text a:hover { color: var(--pink); }
+
+    /* ─── SUCCESS STATE ─── */
+    .success-state {
+      display: none; text-align: center; padding: 20px 0;
+      animation: fadeIn .4s ease both;
+    }
+    .success-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .success-state h3 {
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.3rem; margin-bottom: 8px;
+    }
+    .success-state p { color: var(--gray); font-size: .9rem; line-height: 1.6; }
+
+    /* ─── FORGOT MODAL ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--dark2); border: 1px solid rgba(124,58,237,.3);
+      border-radius: 24px; padding: 40px 36px; width: 100%; max-width: 400px;
+      animation: fadeIn .3s ease both;
+    }
+    .modal-box h3 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; }
+    .modal-box p { color: var(--gray); font-size: .88rem; margin-bottom: 24px; line-height: 1.6; }
+    .modal-close {
+      position: absolute; /* will be relative to modal-header */
+      background: none; border: none; color: var(--gray2); font-size: 1.3rem;
+      cursor: pointer; float: right; margin-top: -28px; margin-right: -8px;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .modal-close-btn {
+      background: none; border: none; color: var(--gray2); font-size: 1.3rem;
+      cursor: pointer; padding: 0; transition: color .2s; line-height: 1;
+    }
+    .modal-close-btn:hover { color: #fff; }
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width: 500px) {
+      .card { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-dots"></div>
+
+<div class="page-wrapper">
+  <div class="card">
+
+    <!-- LOGO -->
+    <div class="logo">
+      <a href="index.html">✦ InfluencerPro</a>
+      <p>Acesse sua conta e comece sua jornada</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Entrar</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Criar conta</button>
+    </div>
+
+    <!-- ══════════ LOGIN FORM ══════════ -->
+    <div id="panel-login">
+      <!-- Social -->
+      <div class="social-btns">
+        <button class="social-btn" onclick="socialLogin('Google')">
+          <span class="icon">🌐</span> Continuar com Google
+        </button>
+        <button class="social-btn" onclick="socialLogin('Facebook')">
+          <span class="icon">📘</span> Continuar com Facebook
+        </button>
+      </div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span>ou entre com e-mail</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <form class="form" id="login-form" onsubmit="submitLogin(event)">
+        <!-- E-mail -->
+        <div class="field">
+          <label for="login-email">E-mail</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email"/>
+          </div>
+          <span class="field-hint" id="login-email-hint">Por favor, insira um e-mail válido.</span>
+        </div>
+
+        <!-- Senha -->
+        <div class="field">
+          <label for="login-password">Senha</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="login-password" placeholder="Sua senha" autocomplete="current-password"/>
+            <button type="button" class="toggle-pwd" onclick="togglePwd('login-password', this)">👁️</button>
+          </div>
+          <span class="field-hint" id="login-password-hint">Insira sua senha.</span>
+        </div>
+
+        <!-- Lembrar + Esqueci -->
+        <div class="extras">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember" checked/>
+            Lembrar de mim
+          </label>
+          <a href="#" class="forgot-link" onclick="openForgot(event)">Esqueci a senha</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="login-btn">
+          <span class="btn-text">Entrar na minha conta →</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <!-- Sucesso login -->
+      <div class="success-state" id="login-success">
+        <div class="success-icon">🎉</div>
+        <h3>Bem-vinda de volta!</h3>
+        <p>Login realizado com sucesso.<br/>Redirecionando para seu painel...</p>
+      </div>
+
+      <div class="switch-text">
+        Ainda não tem conta? <a onclick="switchTab('register')">Criar agora</a>
+      </div>
+    </div>
+
+    <!-- ══════════ REGISTER FORM ══════════ -->
+    <div id="panel-register" style="display:none">
+      <!-- Social -->
+      <div class="social-btns">
+        <button class="social-btn" onclick="socialLogin('Google')">
+          <span class="icon">🌐</span> Cadastrar com Google
+        </button>
+        <button class="social-btn" onclick="socialLogin('Facebook')">
+          <span class="icon">📘</span> Cadastrar com Facebook
+        </button>
+      </div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span>ou preencha os dados</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <form class="form" id="register-form" onsubmit="submitRegister(event)">
+        <!-- Nome completo -->
+        <div class="field">
+          <label for="reg-name">Nome completo</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" id="reg-name" placeholder="Seu nome completo" autocomplete="name"/>
+          </div>
+          <span class="field-hint" id="reg-name-hint">Nome é obrigatório.</span>
+        </div>
+
+        <!-- E-mail -->
+        <div class="field">
+          <label for="reg-email">E-mail</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="reg-email" placeholder="seu@email.com" autocomplete="email"/>
+          </div>
+          <span class="field-hint" id="reg-email-hint">Por favor, insira um e-mail válido.</span>
+        </div>
+
+        <!-- Senha -->
+        <div class="field">
+          <label for="reg-password">Senha</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-password" placeholder="Crie uma senha forte"
+              autocomplete="new-password" oninput="checkStrength(this.value)"/>
+            <button type="button" class="toggle-pwd" onclick="togglePwd('reg-password', this)">👁️</button>
+          </div>
+          <span class="field-hint" id="reg-password-hint">Senha deve ter pelo menos 8 caracteres.</span>
+          <!-- Barra de força -->
+          <div class="strength-wrap" id="strength-wrap" style="display:none">
+            <div class="strength-bars">
+              <div class="bar" id="bar1"></div>
+              <div class="bar" id="bar2"></div>
+              <div class="bar" id="bar3"></div>
+              <div class="bar" id="bar4"></div>
+            </div>
+            <span class="strength-label" id="strength-label"></span>
+            <ul class="pwd-rules">
+              <li id="rule-len"><span class="rule-icon"></span> Mínimo 8 caracteres</li>
+              <li id="rule-upper"><span class="rule-icon"></span> Uma letra maiúscula</li>
+              <li id="rule-num"><span class="rule-icon"></span> Um número</li>
+              <li id="rule-special"><span class="rule-icon"></span> Um caractere especial (!@#$...)</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Confirmar senha -->
+        <div class="field">
+          <label for="reg-confirm">Confirmar senha</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-confirm" placeholder="Repita a senha"
+              autocomplete="new-password" oninput="checkMatch()"/>
+            <button type="button" class="toggle-pwd" onclick="togglePwd('reg-confirm', this)">👁️</button>
+          </div>
+          <span class="field-hint" id="reg-confirm-hint">As senhas não coincidem.</span>
+        </div>
+
+        <!-- Termos -->
+        <div class="field">
+          <label class="checkbox-label">
+            <input type="checkbox" id="reg-terms"/>
+            Li e aceito os <a href="#" style="color:var(--purple-light);text-decoration:none">Termos de Uso</a>
+            e a <a href="#" style="color:var(--purple-light);text-decoration:none">Política de Privacidade</a>
+          </label>
+          <span class="field-hint" id="reg-terms-hint">Você precisa aceitar os termos para continuar.</span>
+        </div>
+
+        <button type="submit" class="btn-submit" id="register-btn">
+          <span class="btn-text">Criar minha conta 🚀</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <!-- Sucesso cadastro -->
+      <div class="success-state" id="register-success">
+        <div class="success-icon">🎊</div>
+        <h3>Conta criada com sucesso!</h3>
+        <p>Verifique seu e-mail para ativar a conta.<br/>O link expira em 24 horas.</p>
+      </div>
+
+      <div class="switch-text">
+        Já tem conta? <a onclick="switchTab('login')">Entrar agora</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── MODAL ESQUECI SENHA ─── -->
+<div class="modal-overlay" id="forgot-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3>🔑 Recuperar senha</h3>
+      </div>
+      <button class="modal-close-btn" onclick="closeForgot()">✕</button>
+    </div>
+    <p>Informe seu e-mail e enviaremos um link para você criar uma nova senha.</p>
+    <form class="form" onsubmit="submitForgot(event)">
+      <div class="field">
+        <label for="forgot-email">E-mail cadastrado</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="forgot-email" placeholder="seu@email.com"/>
+        </div>
+        <span class="field-hint" id="forgot-hint">Insira um e-mail válido.</span>
+      </div>
+      <button type="submit" class="btn-submit" id="forgot-btn" style="margin-top:8px">
+        <span class="btn-text">Enviar link de recuperação</span>
+        <div class="spinner"></div>
+      </button>
+      <div class="success-state" id="forgot-success" style="padding:12px 0">
+        <div class="success-icon" style="font-size:2.5rem">📬</div>
+        <h3 style="font-size:1.1rem">E-mail enviado!</h3>
+        <p>Verifique sua caixa de entrada. O link expira em 30 minutos.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ─── TABS ───
+  function switchTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-register').classList.toggle('active', !isLogin);
+    document.getElementById('panel-login').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('panel-register').style.display = !isLogin ? 'block' : 'none';
+  }
+
+  // ─── TOGGLE PASSWORD VISIBILITY ───
+  function togglePwd(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    btn.textContent = isHidden ? '🙈' : '👁️';
+  }
+
+  // ─── VALIDATIONS ───
+  function validateEmail(val) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  }
+
+  function showError(inputId, hintId, msg) {
+    const input = document.getElementById(inputId);
+    const hint  = document.getElementById(hintId);
+    input.classList.add('error');
+    hint.textContent = msg;
+    hint.classList.add('visible');
+    return false;
+  }
+
+  function clearError(inputId, hintId) {
+    document.getElementById(inputId).classList.remove('error');
+    document.getElementById(hintId).classList.remove('visible');
+  }
+
+  // ─── STRENGTH BAR ───
+  function checkStrength(pwd) {
+    const wrap = document.getElementById('strength-wrap');
+    wrap.style.display = pwd.length > 0 ? 'block' : 'none';
+
+    const rules = {
+      len:     pwd.length >= 8,
+      upper:   /[A-Z]/.test(pwd),
+      num:     /[0-9]/.test(pwd),
+      special: /[^A-Za-z0-9]/.test(pwd),
+    };
+
+    toggleRule('rule-len',     rules.len);
+    toggleRule('rule-upper',   rules.upper);
+    toggleRule('rule-num',     rules.num);
+    toggleRule('rule-special', rules.special);
+
+    const score = Object.values(rules).filter(Boolean).length;
+    const bars  = ['bar1','bar2','bar3','bar4'];
+    const label = document.getElementById('strength-label');
+    const levels = ['', 'weak', 'medium', 'strong', 'strong'];
+    const texts  = ['', 'Fraca', 'Média', 'Forte', 'Muito forte'];
+
+    bars.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.className = 'bar';
+      if (i < score) el.classList.add(levels[score]);
+    });
+    label.textContent = texts[score] ? `Senha ${texts[score]}` : '';
+    label.style.color = score <= 1 ? '#EF4444' : score === 2 ? '#FBBF24' : '#10B981';
+  }
+
+  function toggleRule(id, ok) {
+    document.getElementById(id).classList.toggle('ok', ok);
+  }
+
+  function checkMatch() {
+    const pwd     = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    if (confirm.length === 0) return;
+    if (pwd !== confirm) {
+      showError('reg-confirm', 'reg-confirm-hint', 'As senhas não coincidem.');
+    } else {
+      clearError('reg-confirm', 'reg-confirm-hint');
+    }
+  }
+
+  // ─── SUBMIT LOGIN ───
+  function submitLogin(e) {
+    e.preventDefault();
+    let valid = true;
+    const email = document.getElementById('login-email').value.trim();
+    const pwd   = document.getElementById('login-password').value;
+
+    clearError('login-email',    'login-email-hint');
+    clearError('login-password', 'login-password-hint');
+
+    if (!validateEmail(email)) {
+      showError('login-email', 'login-email-hint', 'Por favor, insira um e-mail válido.');
+      valid = false;
+    }
+    if (pwd.length < 1) {
+      showError('login-password', 'login-password-hint', 'Insira sua senha.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('login-btn');
+    btn.classList.add('loading');
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('login-success').style.display = 'block';
+    }, 1800);
+  }
+
+  // ─── SUBMIT REGISTER ───
+  function submitRegister(e) {
+    e.preventDefault();
+    let valid = true;
+    const name    = document.getElementById('reg-name').value.trim();
+    const email   = document.getElementById('reg-email').value.trim();
+    const pwd     = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    const terms   = document.getElementById('reg-terms').checked;
+
+    ['reg-name','reg-email','reg-password','reg-confirm','reg-terms'].forEach(id => {
+      clearError(id, id + '-hint');
+    });
+
+    if (name.length < 2)        { showError('reg-name', 'reg-name-hint', 'Nome é obrigatório.'); valid = false; }
+    if (!validateEmail(email))  { showError('reg-email', 'reg-email-hint', 'Insira um e-mail válido.'); valid = false; }
+    if (pwd.length < 8)         { showError('reg-password', 'reg-password-hint', 'Senha deve ter pelo menos 8 caracteres.'); valid = false; }
+    if (pwd !== confirm)        { showError('reg-confirm', 'reg-confirm-hint', 'As senhas não coincidem.'); valid = false; }
+    if (!terms)                 { showError('reg-terms', 'reg-terms-hint', 'Você precisa aceitar os termos.'); valid = false; }
+    if (!valid) return;
+
+    const btn = document.getElementById('register-btn');
+    btn.classList.add('loading');
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      document.getElementById('register-form').style.display = 'none';
+      document.getElementById('register-success').style.display = 'block';
+    }, 1800);
+  }
+
+  // ─── FORGOT PASSWORD ───
+  function openForgot(e) {
+    e.preventDefault();
+    document.getElementById('forgot-modal').classList.add('open');
+  }
+  function closeForgot() {
+    document.getElementById('forgot-modal').classList.remove('open');
+  }
+  function submitForgot(e) {
+    e.preventDefault();
+    const email = document.getElementById('forgot-email').value.trim();
+    const hint  = document.getElementById('forgot-hint');
+    if (!validateEmail(email)) {
+      hint.classList.add('visible');
+      return;
+    }
+    hint.classList.remove('visible');
+    const btn = document.getElementById('forgot-btn');
+    btn.classList.add('loading');
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      btn.style.display = 'none';
+      document.getElementById('forgot-success').style.display = 'block';
+    }, 1600);
+  }
+
+  // Fecha modal ao clicar fora
+  document.getElementById('forgot-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeForgot();
+  });
+
+  // ─── SOCIAL LOGIN ───
+  function socialLogin(provider) {
+    alert(`Integração com ${provider} em breve! 🚀`);
+  }
+</script>
+</body>
+</html>
