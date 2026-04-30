@@ -139,11 +139,85 @@
       background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
       border-radius: 20px; padding: 32px 28px;
       transition: border-color .3s, transform .3s;
+      cursor: pointer; position: relative;
     }
     .pain-card:hover { border-color: rgba(236,72,153,.4); transform: translateY(-4px); }
+    .pain-card .free-tag {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(16,185,129,.15); color: #10B981;
+      border: 1px solid rgba(16,185,129,.3); border-radius: 50px;
+      font-size: .68rem; font-weight: 700; padding: 3px 10px; letter-spacing: .4px;
+    }
+    .pain-card .click-hint {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 14px; font-size: .75rem; color: rgba(168,85,247,.7); font-weight: 600;
+    }
+    .pain-card .click-hint::before { content: '💡'; font-size: .8rem; }
     .pain-icon { font-size: 2.2rem; margin-bottom: 16px; }
     .pain-card h3 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; }
     .pain-card p { color: #9CA3AF; font-size: .9rem; line-height: 1.6; }
+
+    /* ─── TIPS MODAL ─── */
+    .tips-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .tips-overlay.open { display: flex; }
+    .tips-box {
+      background: var(--dark2);
+      border: 1px solid rgba(124,58,237,.35);
+      border-radius: 28px; padding: 44px 40px;
+      width: 100%; max-width: 520px; position: relative;
+      animation: popIn .35s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes popIn { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
+    .tips-close {
+      position: absolute; top: 18px; right: 20px;
+      background: rgba(255,255,255,.06); border: none; color: #9CA3AF;
+      width: 32px; height: 32px; border-radius: 50%; font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .tips-close:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .tips-free-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(16,185,129,.12); color: #10B981;
+      border: 1px solid rgba(16,185,129,.25); border-radius: 50px;
+      font-size: .75rem; font-weight: 700; padding: 5px 14px;
+      margin-bottom: 20px; letter-spacing: .4px;
+    }
+    .tips-box-icon { font-size: 2.4rem; margin-bottom: 12px; }
+    .tips-box h3 {
+      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.25rem;
+      margin-bottom: 6px; line-height: 1.3;
+    }
+    .tips-box .tips-subtitle {
+      color: #9CA3AF; font-size: .88rem; margin-bottom: 24px; line-height: 1.5;
+    }
+    .tips-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+    .tip-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px; padding: 16px 18px;
+      transition: border-color .2s;
+    }
+    .tip-item:hover { border-color: rgba(124,58,237,.3); }
+    .tip-num {
+      width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+      background: var(--gradient); display: flex; align-items: center;
+      justify-content: center; font-family: 'Poppins', sans-serif;
+      font-weight: 800; font-size: .75rem; margin-top: 1px;
+    }
+    .tip-item p { font-size: .9rem; color: #D1D5DB; line-height: 1.55; }
+    .tip-item strong { color: #fff; }
+    .tips-cta-row {
+      display: flex; flex-direction: column; gap: 10px; align-items: center;
+    }
+    .tips-cta-row .btn-primary { width: 100%; justify-content: center; font-size: .95rem; padding: 15px; }
+    .tips-cta-row .tips-note { font-size: .75rem; color: #6B7280; }
+
+    @media(max-width:560px){ .tips-box{ padding:36px 24px; } }
 
     /* ─── SOLUTION ─── */
     #solution { position: relative; overflow: hidden; }
@@ -434,39 +508,67 @@
     <h2>A dor de <em>querer ser influencer</em><br/>mas não saber por onde começar</h2>
     <p class="section-sub">Você não está sozinho. A maioria das pessoas trava nesses mesmos pontos antes de ter acesso ao caminho certo.</p>
     <div class="pain-grid fade-up">
-      <div class="pain-card">
+      <div class="pain-card" onclick="openTip('crescimento')">
+        <span class="free-tag">✦ Dica grátis</span>
         <div class="pain-icon">😤</div>
         <h3>"Já tentei, mas não cresce"</h3>
         <p>Você posta, posta e posta, mas os seguidores não chegam. Parece que o algoritmo odeia você.</p>
+        <div class="click-hint">Clique para ver a solução rápida</div>
       </div>
-      <div class="pain-card">
+      <div class="pain-card" onclick="openTip('monetizacao')">
+        <span class="free-tag">✦ Dica grátis</span>
         <div class="pain-icon">💸</div>
         <h3>"Não sei como ganhar dinheiro"</h3>
         <p>Todo mundo fala em monetizar, mas ninguém te mostra o passo a passo real de como o dinheiro entra na conta.</p>
+        <div class="click-hint">Clique para ver a solução rápida</div>
       </div>
-      <div class="pain-card">
+      <div class="pain-card" onclick="openTip('aparecer')">
+        <span class="free-tag">✦ Dica grátis</span>
         <div class="pain-icon">🤯</div>
         <h3>"Tenho medo de aparecer"</h3>
         <p>Você quer criar conteúdo mas trava na câmera, tem vergonha do julgamento ou não sabe o que falar.</p>
+        <div class="click-hint">Clique para ver a solução rápida</div>
       </div>
-      <div class="pain-card">
+      <div class="pain-card" onclick="openTip('tempo')">
+        <span class="free-tag">✦ Dica grátis</span>
         <div class="pain-icon">⏰</div>
         <h3>"Não tenho tempo"</h3>
         <p>Entre trabalho, estudos e família, parece impossível manter uma constância nas redes sociais.</p>
+        <div class="click-hint">Clique para ver a solução rápida</div>
       </div>
-      <div class="pain-card">
+      <div class="pain-card" onclick="openTip('nicho')">
+        <span class="free-tag">✦ Dica grátis</span>
         <div class="pain-icon">🎭</div>
         <h3>"Não tenho nicho definido"</h3>
         <p>Você não sabe sobre o que falar ou acha que não tem nada de especial para mostrar ao mundo.</p>
+        <div class="click-hint">Clique para ver a solução rápida</div>
       </div>
-      <div class="pain-card">
+      <div class="pain-card" onclick="openTip('publi')">
+        <span class="free-tag">✦ Dica grátis</span>
         <div class="pain-icon">📉</div>
         <h3>"Fiz publi e me queimei"</h3>
         <p>Já tentou cobrar de empresa mas não soube precificar, ou aceitou qualquer coisa e se arrependeu.</p>
+        <div class="click-hint">Clique para ver a solução rápida</div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- TIPS MODAL -->
+<div class="tips-overlay" id="tips-overlay" onclick="closeTip(event)">
+  <div class="tips-box" id="tips-box">
+    <button class="tips-close" onclick="closeTipBtn()">✕</button>
+    <div class="tips-free-badge">✦ Conteúdo gratuito</div>
+    <div class="tips-box-icon" id="tip-icon"></div>
+    <h3 id="tip-title"></h3>
+    <p class="tips-subtitle" id="tip-subtitle"></p>
+    <div class="tips-list" id="tip-list"></div>
+    <div class="tips-cta-row">
+      <a href="login.html" class="btn-primary">🚀 Quero o método completo</a>
+      <span class="tips-note">Acesso imediato ao manual com todos os detalhes →</span>
+    </div>
+  </div>
+</div>
 
 <!-- SOLUTION -->
 <section id="solution">
@@ -795,6 +897,98 @@
     });
   }, { threshold: 0.3 });
   pricingObserver.observe(pricingSec);
+
+  // ─── TIPS DATA ───
+  const tips = {
+    crescimento: {
+      icon: '😤',
+      title: 'Por que seu perfil não cresce?',
+      subtitle: '3 erros que a maioria comete — e como corrigir agora mesmo.',
+      items: [
+        { strong: 'Poste nos horários certos.', text: ' O algoritmo favorece quem publica quando sua audiência está ativa. Teste postar entre 18h–21h e veja a diferença no alcance.' },
+        { strong: 'Use os primeiros 3 segundos para fisgar.', text: ' O vídeo precisa prender antes de a pessoa rolar o feed. Comece com uma pergunta, um número ou uma afirmação surpreendente.' },
+        { strong: 'Responda todos os comentários nas primeiras 2h.', text: ' Interação logo após postar sinaliza ao algoritmo que seu conteúdo é relevante e ele entrega para mais pessoas.' },
+      ]
+    },
+    monetizacao: {
+      icon: '💸',
+      title: 'Sua primeira fonte de renda como influencer',
+      subtitle: 'Você não precisa de 100k seguidores para começar a ganhar dinheiro.',
+      items: [
+        { strong: 'Marketing de afiliados:', text: ' Indique produtos que você já usa pela Hotmart, Monetizze ou Amazon e ganhe comissão a cada venda. Funciona com qualquer tamanho de audiência.' },
+        { strong: 'Venda um infoproduto simples:', text: ' Um e-book de R$27 sobre algo que você sabe já é uma fonte de renda. Crie no Canva, venda pela Hotmart em menos de 1 dia.' },
+        { strong: 'Micro-publi para negócios locais:', text: ' Pequenas empresas da sua cidade pagam entre R$100–R$500 por stories e posts. Você não precisa ser famoso, só ter um nicho claro.' },
+      ]
+    },
+    aparecer: {
+      icon: '🤯',
+      title: 'Como vencer o medo da câmera',
+      subtitle: 'Todo grande influencer já travou. O segredo é o treino, não o talento.',
+      items: [
+        { strong: 'Grave sem postar:', text: ' Por 7 dias, grave um vídeo de 30s por dia só para você assistir. Você vai se acostumar com sua voz e imagem sem a pressão do julgamento.' },
+        { strong: 'Comece pela câmera traseira:', text: ' Mostre o que você está fazendo, o lugar onde está, o que está comendo. Apareça aos poucos — você não precisa mostrar o rosto desde o dia 1.' },
+        { strong: 'Tenha um roteiro de 3 linhas:', text: ' Problema → Solução → Chamada para ação. Com essa estrutura, você nunca vai travar sem saber o que falar.' },
+      ]
+    },
+    tempo: {
+      icon: '⏰',
+      title: 'Como criar conteúdo sem tempo livre',
+      subtitle: 'Consistência não é postar todo dia — é postar de forma inteligente.',
+      items: [
+        { strong: 'Técnica do bloco:', text: ' Reserve 2h por semana (pode ser sábado de manhã) para gravar 5–7 vídeos de uma vez. Use o resto da semana só para postar e responder.' },
+        { strong: 'Reaproveitamento de conteúdo:', text: ' Um vídeo longo vira 3 Reels, 1 carrossel e 5 stories. Você cria uma vez e distribui em múltiplos formatos e dias.' },
+        { strong: 'Use o que você já faz:', text: ' Cozinhou? Gravou. Foi à academia? Gravou. Você não precisa criar situações — documente sua vida e transforme em conteúdo.' },
+      ]
+    },
+    nicho: {
+      icon: '🎭',
+      title: 'Como descobrir seu nicho em 10 minutos',
+      subtitle: 'Você tem mais para oferecer do que imagina. Veja como encontrar.',
+      items: [
+        { strong: 'Responda 3 perguntas:', text: ' O que você faz melhor que a maioria das pessoas? Sobre o que te perguntam com frequência? O que você consumiria de graça por horas? A interseção é o seu nicho.' },
+        { strong: 'Nicho não precisa ser único:', text: ' Você não precisa inventar algo novo — precisa falar sobre algo conhecido do seu jeito. Culinária, finanças, moda e fitness ainda crescem todo ano.' },
+        { strong: 'Teste antes de travar:', text: ' Poste 10 vídeos sobre um assunto e observe o que performou melhor. Dados reais valem mais que qualquer planejamento longo no papel.' },
+      ]
+    },
+    publi: {
+      icon: '📉',
+      title: 'Como fazer publi sem se queimar',
+      subtitle: 'O problema não é aceitar publi — é aceitar sem critério e sem preço justo.',
+      items: [
+        { strong: 'Regra de ouro:', text: ' Só feche publi de produtos que você usaria de graça. Sua audiência percebe quando é forçado — e uma reputação demora anos para reconstruir.' },
+        { strong: 'Preço mínimo por seguidores:', text: ' Menos de 10k: R$150–300 por story. 10k–50k: R$300–800. Acima de 50k: negocie pacote. Nunca aceite "permuta" como pagamento único.' },
+        { strong: 'Peça briefing por escrito:', text: ' Antes de fechar qualquer contrato, exija: o que deve ser dito, o que não pode ser dito, prazo de entrega e quantas revisões estão inclusas.' },
+      ]
+    }
+  };
+
+  // ─── OPEN / CLOSE ───
+  function openTip(key) {
+    const data = tips[key];
+    document.getElementById('tip-icon').textContent = data.icon;
+    document.getElementById('tip-title').textContent = data.title;
+    document.getElementById('tip-subtitle').textContent = data.subtitle;
+
+    const list = document.getElementById('tip-list');
+    list.innerHTML = data.items.map((item, i) => `
+      <div class="tip-item">
+        <div class="tip-num">${i + 1}</div>
+        <p><strong>${item.strong}</strong>${item.text}</p>
+      </div>
+    `).join('');
+
+    document.getElementById('tips-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeTip(e) {
+    if (e.target === document.getElementById('tips-overlay')) closeTipBtn();
+  }
+  function closeTipBtn() {
+    document.getElementById('tips-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTipBtn(); });
 </script>
 </body>
 </html>
