@@ -625,6 +625,7 @@
       btn.classList.remove('loading');
       document.getElementById('login-form').style.display = 'none';
       document.getElementById('login-success').style.display = 'block';
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
     }, 1800);
   }
 

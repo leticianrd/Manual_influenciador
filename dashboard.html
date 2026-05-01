@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meu Painel | InfluencerPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #7C3AED; --purple-light: #A855F7; --pink: #EC4899;
+      --yellow: #FBBF24; --green: #10B981; --red: #EF4444;
+      --dark: #0F0A1E; --dark2: #1A1035; --dark3: #241848;
+      --white: #fff; --gray: #9CA3AF; --gray2: #6B7280;
+      --border: rgba(255,255,255,0.08);
+      --gradient: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--white); min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; height: 100vh; width: 260px;
+      background: var(--dark2); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; z-index: 50;
+      transition: transform .3s;
+    }
+    .sidebar-logo {
+      padding: 28px 24px 20px;
+      font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.15rem;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo span { display: block; font-size: .7rem; font-weight: 500;
+      color: var(--gray); -webkit-text-fill-color: var(--gray); margin-top: 2px; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-label { font-size: .68rem; font-weight: 700; color: var(--gray2);
+      letter-spacing: 1px; text-transform: uppercase; padding: 0 12px; margin: 16px 0 8px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; border-radius: 12px; cursor: pointer;
+      transition: all .2s; text-decoration: none; color: var(--gray);
+      font-size: .88rem; font-weight: 500; margin-bottom: 2px;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
+    .nav-item.active { background: rgba(124,58,237,.2); color: #fff;
+      border: 1px solid rgba(124,58,237,.3); }
+    .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-item .nav-badge {
+      margin-left: auto; background: var(--gradient); color: #fff;
+      font-size: .62rem; font-weight: 700; padding: 2px 7px; border-radius: 50px;
+    }
+    .sidebar-footer {
+      padding: 16px 12px; border-top: 1px solid var(--border);
+    }
+    .user-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(255,255,255,.04);
+    }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--gradient); display: flex; align-items: center;
+      justify-content: center; font-size: 1rem; flex-shrink: 0;
+    }
+    .user-name { font-size: .85rem; font-weight: 600; }
+    .user-plan { font-size: .7rem; color: var(--green); }
+    .logout-btn {
+      margin-top: 8px; width: 100%; padding: 10px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 10px; color: var(--gray2); font-size: .8rem;
+      cursor: pointer; transition: all .2s; display: flex; align-items: center;
+      justify-content: center; gap: 6px;
+    }
+    .logout-btn:hover { border-color: rgba(239,68,68,.4); color: var(--red); }
+
+    /* ── TOPBAR (mobile) ── */
+    .topbar {
+      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+      background: rgba(15,10,30,.92); backdrop-filter: blur(12px);
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      align-items: center; justify-content: space-between;
+    }
+    .topbar-logo { font-family: 'Poppins', sans-serif; font-weight: 800;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .menu-btn { background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; }
+
+    /* ── MAIN ── */
+    .main { margin-left: 260px; min-height: 100vh; }
+    .main-inner { max-width: 900px; margin: 0 auto; padding: 48px 40px; }
+
+    /* ── WELCOME ── */
+    .welcome-bar {
+      background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.25);
+      border-radius: 20px; padding: 28px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; margin-bottom: 40px; flex-wrap: wrap;
+    }
+    .welcome-bar h1 { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 4px; }
+    .welcome-bar p { color: var(--gray); font-size: .9rem; }
+    .progress-wrap { min-width: 180px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: .78rem; margin-bottom: 8px; }
+    .progress-label span:last-child { color: var(--purple-light); font-weight: 700; }
+    .progress-bar { height: 8px; background: rgba(255,255,255,.08); border-radius: 50px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--gradient); border-radius: 50px;
+      width: 0%; transition: width 1s ease .3s; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+      color: var(--gray);
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── STATS ROW ── */
+    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 40px; }
+    .stat-card {
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px 22px;
+    }
+    .stat-card .s-label { font-size: .75rem; color: var(--gray); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .stat-card .s-val { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.6rem; }
+    .stat-card .s-sub { font-size: .72rem; color: var(--gray2); margin-top: 4px; }
+
+    /* ── MODULES ── */
+    .modules-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+    .module-row {
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden; transition: border-color .25s;
+    }
+    .module-row:hover { border-color: rgba(124,58,237,.35); }
+    .module-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 22px 24px; cursor: pointer; user-select: none;
+    }
+    .module-num-badge {
+      width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+      background: var(--gradient); display: flex; align-items: center;
+      justify-content: center; font-family: 'Poppins', sans-serif;
+      font-weight: 800; font-size: .85rem;
+    }
+    .module-info { flex: 1; }
+    .module-step { font-size: .7rem; color: var(--purple-light); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
+    .module-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; }
+    .module-meta { font-size: .75rem; color: var(--gray); margin-top: 2px; }
+    .module-right { display: flex; align-items: center; gap: 10px; }
+    .status-badge {
+      font-size: .7rem; font-weight: 700; padding: 4px 10px; border-radius: 50px;
+    }
+    .status-badge.done { background: rgba(16,185,129,.15); color: var(--green); border: 1px solid rgba(16,185,129,.25); }
+    .status-badge.current { background: rgba(124,58,237,.2); color: #C4B5FD; border: 1px solid rgba(124,58,237,.3); }
+    .status-badge.locked { background: rgba(255,255,255,.04); color: var(--gray2); border: 1px solid var(--border); }
+    .chevron { color: var(--gray2); transition: transform .3s; font-size: 1rem; }
+    .module-row.open .chevron { transform: rotate(180deg); }
+
+    .module-body { display: none; border-top: 1px solid var(--border); }
+    .module-row.open .module-body { display: block; }
+    .module-content { padding: 28px 24px; }
+    .module-intro { color: var(--gray); font-size: .92rem; line-height: 1.7; margin-bottom: 24px; }
+
+    .tip-box {
+      background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.2);
+      border-radius: 14px; padding: 16px 20px; margin-bottom: 24px;
+      font-size: .88rem; line-height: 1.6;
+    }
+    .tip-box strong { color: var(--purple-light); }
+
+    .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 24px; }
+    .content-card {
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 16px;
+    }
+    .content-card h4 { font-family: 'Poppins', sans-serif; font-weight: 700;
+      font-size: .85rem; margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+    .content-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .content-card ul li { font-size: .8rem; color: var(--gray); display: flex; gap: 7px; line-height: 1.4; }
+    .content-card ul li::before { content: '→'; color: var(--purple-light); flex-shrink: 0; font-size: .75rem; margin-top: 1px; }
+
+    .highlight-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 10px; margin-bottom: 24px; }
+    .highlight-card {
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .highlight-card h4 { font-size: .8rem; font-weight: 700; margin-bottom: 6px; }
+    .highlight-card p { font-size: .78rem; line-height: 1.5; opacity: .85; }
+    .hl-pink { background: rgba(236,72,153,.12); border: 1px solid rgba(236,72,153,.2); }
+    .hl-dark { background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.08); }
+    .hl-red { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.2); }
+    .hl-purple { background: rgba(124,58,237,.12); border: 1px solid rgba(124,58,237,.2); }
+    .hl-yellow { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.2); }
+    .hl-green { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.2); }
+
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: .88rem; color: #D1D5DB; line-height: 1.5;
+    }
+    .checklist li .ck { width: 18px; height: 18px; border-radius: 5px;
+      background: var(--gradient); display: flex; align-items: center;
+      justify-content: center; font-size: .6rem; flex-shrink: 0; margin-top: 1px; }
+
+    .module-actions { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 8px; }
+    .btn-done {
+      background: var(--gradient); color: #fff; border: none;
+      padding: 11px 22px; border-radius: 10px; font-family: 'Poppins', sans-serif;
+      font-weight: 700; font-size: .85rem; cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-done:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,.4); }
+    .btn-outline {
+      background: transparent; color: var(--gray); border: 1px solid var(--border);
+      padding: 11px 22px; border-radius: 10px; font-family: 'Poppins', sans-serif;
+      font-weight: 600; font-size: .85rem; cursor: pointer; transition: all .2s;
+    }
+    .btn-outline:hover { border-color: rgba(124,58,237,.4); color: var(--purple-light); }
+
+    /* ── DOWNLOAD CARD ── */
+    .download-card {
+      background: var(--gradient); border-radius: 20px; padding: 32px 28px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .download-icon { font-size: 2.8rem; flex-shrink: 0; }
+    .download-text h3 { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 4px; }
+    .download-text p { font-size: .85rem; opacity: .88; }
+    .download-text { flex: 1; }
+    .btn-download {
+      background: #fff; color: var(--purple); border: none;
+      padding: 13px 24px; border-radius: 12px; font-family: 'Poppins', sans-serif;
+      font-weight: 800; font-size: .9rem; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2); transition: transform .2s;
+      white-space: nowrap;
+    }
+    .btn-download:hover { transform: translateY(-2px); }
+
+    /* ── BONUS SECTION ── */
+    .bonus-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; margin-bottom: 40px; }
+    .bonus-item {
+      background: rgba(251,191,36,.05); border: 1px solid rgba(251,191,36,.15);
+      border-radius: 16px; padding: 20px 18px; text-align: center;
+      transition: all .2s;
+    }
+    .bonus-item:hover { border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.08); }
+    .bonus-item .b-icon { font-size: 2rem; margin-bottom: 10px; }
+    .bonus-item h4 { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: .85rem; margin-bottom: 6px; }
+    .bonus-item p { font-size: .75rem; color: var(--gray); line-height: 1.4; margin-bottom: 12px; }
+    .btn-bonus {
+      background: rgba(251,191,36,.15); color: var(--yellow); border: 1px solid rgba(251,191,36,.3);
+      padding: 7px 14px; border-radius: 8px; font-size: .75rem; font-weight: 700;
+      cursor: pointer; transition: all .2s; display: inline-block; text-decoration: none;
+    }
+    .btn-bonus:hover { background: rgba(251,191,36,.25); }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .topbar { display: flex; }
+      .main { margin-left: 0; }
+      .main-inner { padding: 80px 20px 40px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .welcome-bar { flex-direction: column; align-items: flex-start; }
+    }
+    @media(max-width:480px){ .stats-row{ grid-template-columns:1fr; } }
+
+    /* ── OVERLAY (mobile sidebar) ── */
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 49; backdrop-filter: blur(4px);
+    }
+    .sidebar-overlay.open { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    ✦ InfluencerPro
+    <span>Área do Aluno</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Menu</div>
+    <a href="#inicio" class="nav-item active" onclick="setActive(this)">
+      <span class="nav-icon">🏠</span> Início
+    </a>
+    <a href="#modulos" class="nav-item" onclick="setActive(this)">
+      <span class="nav-icon">📚</span> Módulos
+      <span class="nav-badge">6</span>
+    </a>
+    <a href="#bonus" class="nav-item" onclick="setActive(this)">
+      <span class="nav-icon">🎁</span> Bônus
+    </a>
+    <a href="#download" class="nav-item" onclick="setActive(this)">
+      <span class="nav-icon">📥</span> Downloads
+    </a>
+
+    <div class="nav-label">Plataformas</div>
+    <a href="https://instagram.com" target="_blank" class="nav-item">
+      <span class="nav-icon">📷</span> Instagram
+    </a>
+    <a href="https://tiktok.com" target="_blank" class="nav-item">
+      <span class="nav-icon">🎵</span> TikTok
+    </a>
+    <a href="https://youtube.com" target="_blank" class="nav-item">
+      <span class="nav-icon">▶️</span> YouTube
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar">🧑</div>
+      <div>
+        <div class="user-name">Meu Perfil</div>
+        <div class="user-plan">✦ Acesso completo</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='login.html'">
+      🚪 Sair da conta
+    </button>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- TOPBAR MOBILE -->
+<div class="topbar">
+  <span class="topbar-logo">✦ InfluencerPro</span>
+  <button class="menu-btn" onclick="openSidebar()">☰</button>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="main-inner">
+
+    <!-- BOAS-VINDAS -->
+    <div class="welcome-bar" id="inicio">
+      <div>
+        <h1>Bem-vindo(a) ao seu Manual! 🎉</h1>
+        <p>Você tem acesso a todos os 6 módulos + bônus exclusivos. Bora começar?</p>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Seu progresso</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="s-label">📚 Módulos</div>
+        <div class="s-val" id="stat-done">0/6</div>
+        <div class="s-sub">concluídos</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">🎁 Bônus</div>
+        <div class="s-val">4</div>
+        <div class="s-sub">disponíveis para download</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">📥 Material</div>
+        <div class="s-val">1</div>
+        <div class="s-sub">PDF completo disponível</div>
+      </div>
+    </div>
+
+    <!-- DOWNLOAD PDF -->
+    <div class="download-card" id="download">
+      <div class="download-icon">📖</div>
+      <div class="download-text">
+        <h3>Manual do Influenciador Digital — PDF Completo</h3>
+        <p>6 passos práticos para construir sua presença, engajar seu público e monetizar nas principais plataformas.</p>
+      </div>
+      <a href="manual.pdf" download="Manual-do-Influenciador-Digital.pdf" class="btn-download">
+        ⬇️ Baixar PDF
+      </a>
+    </div>
+
+    <!-- MÓDULOS -->
+    <div id="modulos">
+      <div class="section-title">📚 Os 6 Módulos do Manual</div>
+      <div class="modules-list">
+
+        <!-- MÓDULO 1 -->
+        <div class="module-row" id="mod-1">
+          <div class="module-header" onclick="toggleModule('mod-1')">
+            <div class="module-num-badge">01</div>
+            <div class="module-info">
+              <div class="module-step">Passo 1</div>
+              <div class="module-title">Escolhendo seu Nicho</div>
+              <div class="module-meta">Paixão + demanda + consistência</div>
+            </div>
+            <div class="module-right">
+              <span class="status-badge current" id="badge-mod-1">Em andamento</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="module-content">
+              <p class="module-intro">O nicho é o coração da sua estratégia. Ele define quem você alcança, como você fala e onde você cresce. Escolhe com base em <strong>paixão + demanda + consistência</strong>.</p>
+              <div class="content-grid">
+                <div class="content-card">
+                  <h4>💄 Beleza & Lifestyle</h4>
+                  <ul>
+                    <li>Público majoritariamente feminino</li>
+                    <li>Forte no Instagram (fotos + Reels)</li>
+                    <li>TikTok para tutoriais rápidos</li>
+                    <li>YouTube para reviews longos</li>
+                  </ul>
+                </div>
+                <div class="content-card">
+                  <h4>🎮 Games & Tecnologia</h4>
+                  <ul>
+                    <li>Público masculino e misto</li>
+                    <li>YouTube para gameplays e reviews</li>
+                    <li>TikTok cresce com clips virais</li>
+                    <li>Instagram para comunidade</li>
+                  </ul>
+                </div>
+                <div class="content-card">
+                  <h4>🍳 Gastronomia & Receitas</h4>
+                  <ul>
+                    <li>Público amplo e misto</li>
+                    <li>TikTok e Reels explodem</li>
+                    <li>YouTube para episódios completos</li>
+                    <li>Receitas rápidas viralizam</li>
+                  </ul>
+                </div>
+                <div class="content-card">
+                  <h4>💪 Saúde & Bem-estar</h4>
+                  <ul>
+                    <li>Instagram funciona com rotinas</li>
+                    <li>TikTok viraliza transformações</li>
+                    <li>YouTube retém com treinos</li>
+                    <li>Público feminino e misto</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tip-box">
+                💡 <strong>Dica de ouro:</strong> nichos específicos engajam mais do que nichos genéricos. "Moda sustentável para plus size" converte mais do que apenas "moda".
+              </div>
+              <div class="module-actions">
+                <button class="btn-done" onclick="markDone('mod-1', this)">✓ Marcar como concluído</button>
+                <button class="btn-outline" onclick="toggleModule('mod-1')">Fechar módulo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 2 -->
+        <div class="module-row" id="mod-2">
+          <div class="module-header" onclick="toggleModule('mod-2')">
+            <div class="module-num-badge">02</div>
+            <div class="module-info">
+              <div class="module-step">Passo 2</div>
+              <div class="module-title">Identidade Visual do Perfil</div>
+              <div class="module-meta">Paleta, tom de voz e estilo únicos</div>
+            </div>
+            <div class="module-right">
+              <span class="status-badge locked" id="badge-mod-2">Não iniciado</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="module-content">
+              <p class="module-intro">Sua identidade visual é o que faz as pessoas te reconhecerem antes mesmo de ler seu nome. Seja intencional em cada detalhe.</p>
+              <div class="section-title" style="margin-bottom:16px">Os 4 Pilares da Identidade</div>
+              <ul class="checklist">
+                <li><span class="ck">✓</span><span><strong>Paleta de cores:</strong> escolha 2–3 cores fixas e use em todo o conteúdo</span></li>
+                <li><span class="ck">✓</span><span><strong>Tipografia:</strong> fontes consistentes em thumbnails e stories</span></li>
+                <li><span class="ck">✓</span><span><strong>Tom de voz:</strong> descontraído, técnico ou inspiracional — defina e mantenha</span></li>
+                <li><span class="ck">✓</span><span><strong>Filtro de foto/vídeo:</strong> um preset único cria reconhecimento visual imediato</span></li>
+              </ul>
+              <div class="highlight-row">
+                <div class="highlight-card hl-pink">
+                  <h4>📷 Instagram</h4>
+                  <p>Feed coeso, paleta uniforme, Highlights com capas personalizadas</p>
+                </div>
+                <div class="highlight-card hl-dark">
+                  <h4>🎵 TikTok</h4>
+                  <p>Intro de 1s impactante, legenda na tela, transições alinhadas ao estilo</p>
+                </div>
+                <div class="highlight-card hl-red">
+                  <h4>▶️ YouTube</h4>
+                  <p>Thumbnails padronizadas, banner do canal, abertura e encerramento fixos</p>
+                </div>
+              </div>
+              <div class="tip-box">
+                💡 <strong>Dica:</strong> mesmo estilo em todas as plataformas <strong>ou</strong> identidades adaptadas por canal — ambas as estratégias funcionam, desde que sejam intencionais.
+              </div>
+              <div class="module-actions">
+                <button class="btn-done" onclick="markDone('mod-2', this)">✓ Marcar como concluído</button>
+                <button class="btn-outline" onclick="toggleModule('mod-2')">Fechar módulo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 3 -->
+        <div class="module-row" id="mod-3">
+          <div class="module-header" onclick="toggleModule('mod-3')">
+            <div class="module-num-badge">03</div>
+            <div class="module-info">
+              <div class="module-step">Passo 3</div>
+              <div class="module-title">Como o Algoritmo Funciona</div>
+              <div class="module-meta">Retenção, interação e constância</div>
+            </div>
+            <div class="module-right">
+              <span class="status-badge locked" id="badge-mod-3">Não iniciado</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="module-content">
+              <p class="module-intro">Cada plataforma tem sua lógica — mas todas recompensam <strong>retenção, interação e consistência</strong>. Entender o algoritmo é a diferença entre crescer e estagnar.</p>
+              <div class="content-grid">
+                <div class="content-card">
+                  <h4>📷 Instagram</h4>
+                  <ul>
+                    <li>Prioriza Reels com alta taxa de replays</li>
+                    <li>Salvamentos pesam muito no alcance</li>
+                    <li>Poste nos horários de pico do público</li>
+                    <li>Use 3 a 5 hashtags relevantes</li>
+                  </ul>
+                </div>
+                <div class="content-card">
+                  <h4>🎵 TikTok</h4>
+                  <ul>
+                    <li>Avalia tempo assistido e retenção total</li>
+                    <li>Os primeiros 3 segundos definem tudo</li>
+                    <li>Tendências de áudio ampliam o alcance</li>
+                    <li>Duetos aumentam a visibilidade</li>
+                  </ul>
+                </div>
+                <div class="content-card">
+                  <h4>▶️ YouTube</h4>
+                  <ul>
+                    <li>Valoriza CTR da thumbnail</li>
+                    <li>Tempo de sessão é crucial</li>
+                    <li>Títulos com palavras-chave = mais cliques</li>
+                    <li>Playlists retêm espectadores</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tip-box">
+                🔥 <strong>Hack universal:</strong> responda comentários nas primeiras horas após postar. Isso sinaliza atividade ao algoritmo e impulsiona o alcance organicamente.
+              </div>
+              <div class="module-actions">
+                <button class="btn-done" onclick="markDone('mod-3', this)">✓ Marcar como concluído</button>
+                <button class="btn-outline" onclick="toggleModule('mod-3')">Fechar módulo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 4 -->
+        <div class="module-row" id="mod-4">
+          <div class="module-header" onclick="toggleModule('mod-4')">
+            <div class="module-num-badge">04</div>
+            <div class="module-info">
+              <div class="module-step">Passo 4</div>
+              <div class="module-title">Diferentes Tipos de Produção</div>
+              <div class="module-meta">Formato certo na plataforma certa</div>
+            </div>
+            <div class="module-right">
+              <span class="status-badge locked" id="badge-mod-4">Não iniciado</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="module-content">
+              <p class="module-intro">Produzir conteúdo de forma estratégica é saber adaptar o formato a cada plataforma. O mesmo tema, formatos diferentes = alcance multiplicado.</p>
+              <div class="highlight-row">
+                <div class="highlight-card hl-pink">
+                  <h4>📷 Instagram</h4>
+                  <p>Fotos editadas com preset, Reels de 15–30s, Stories diários informais</p>
+                </div>
+                <div class="highlight-card hl-dark">
+                  <h4>🎵 TikTok</h4>
+                  <p>Vídeo vertical 15–60s, áudio em alta, legendas na tela, cortes rápidos</p>
+                </div>
+                <div class="highlight-card hl-red">
+                  <h4>▶️ YouTube</h4>
+                  <p>Vídeo horizontal 8–20min, roteiro estruturado, b-roll e thumbnail atrativa</p>
+                </div>
+              </div>
+              <div class="tip-box">
+                ⏱️ <strong>Frequência ideal:</strong> 3–5x/semana no TikTok e Instagram, 1–2x/semana no YouTube. <strong>Consistência supera perfeição.</strong>
+              </div>
+              <div class="module-actions">
+                <button class="btn-done" onclick="markDone('mod-4', this)">✓ Marcar como concluído</button>
+                <button class="btn-outline" onclick="toggleModule('mod-4')">Fechar módulo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 5 -->
+        <div class="module-row" id="mod-5">
+          <div class="module-header" onclick="toggleModule('mod-5')">
+            <div class="module-num-badge">05</div>
+            <div class="module-info">
+              <div class="module-step">Passo 5</div>
+              <div class="module-title">Monetização nas Plataformas</div>
+              <div class="module-meta">Conheça as regras e comece a ganhar</div>
+            </div>
+            <div class="module-right">
+              <span class="status-badge locked" id="badge-mod-5">Não iniciado</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="module-content">
+              <p class="module-intro">Cada plataforma tem seus próprios requisitos para liberar a monetização. Conheça cada um deles e planeje sua estratégia.</p>
+              <div class="content-grid">
+                <div class="content-card">
+                  <h4>📷 Instagram</h4>
+                  <ul>
+                    <li>Conta profissional (criador ou empresa)</li>
+                    <li>+10k seguidores para selos de parceria</li>
+                    <li>Programa de Bônus em Reels (por convite)</li>
+                    <li>Loja integrada: produto físico + conta comercial</li>
+                    <li>Selo de parceria paga em publis obrigatório</li>
+                  </ul>
+                </div>
+                <div class="content-card">
+                  <h4>🎵 TikTok</h4>
+                  <ul>
+                    <li>+18 anos e +1.000 seguidores</li>
+                    <li>Creator Fund: +10k seg. e 100k views/30 dias</li>
+                    <li>LIVE Gifts: +1.000 seguidores para presentes</li>
+                    <li>TikTok Shop: loja virtual integrada</li>
+                  </ul>
+                </div>
+                <div class="content-card">
+                  <h4>▶️ YouTube</h4>
+                  <ul>
+                    <li>YPP: +1.000 inscritos e 4.000h assistidas/ano</li>
+                    <li>Ou +10M views em Shorts</li>
+                    <li>AdSense via CNPJ ou CPF</li>
+                    <li>Super Thanks, Membros e Merchandise Shelf</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="tip-box">
+                ⚠️ <strong>Atenção:</strong> em todas as plataformas, o conteúdo patrocinado <strong>deve ser sinalizado</strong> como publicidade. No Brasil, siga as diretrizes do CONAR.
+              </div>
+              <div class="module-actions">
+                <button class="btn-done" onclick="markDone('mod-5', this)">✓ Marcar como concluído</button>
+                <button class="btn-outline" onclick="toggleModule('mod-5')">Fechar módulo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 6 -->
+        <div class="module-row" id="mod-6">
+          <div class="module-header" onclick="toggleModule('mod-6')">
+            <div class="module-num-badge">06</div>
+            <div class="module-info">
+              <div class="module-step">Passo 6</div>
+              <div class="module-title">Aprenda a Negociar com as Marcas</div>
+              <div class="module-meta">Precificação, contratos e media kit</div>
+            </div>
+            <div class="module-right">
+              <span class="status-badge locked" id="badge-mod-6">Não iniciado</span>
+              <span class="chevron">▼</span>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="module-content">
+              <p class="module-intro">Seja você quem propõe ou quem recebe a proposta, a postura é tudo. Trate cada parceria como um contrato de trabalho profissional.</p>
+              <ul class="checklist">
+                <li><span class="ck">✓</span><span><strong>Você propõe:</strong> envie um media kit com métricas, nicho e diferenciais</span></li>
+                <li><span class="ck">✓</span><span><strong>A marca propõe:</strong> avalie alinhamento com seus valores antes do valor financeiro</span></li>
+                <li><span class="ck">✓</span><span>Nunca aceite pressão para omitir que é publicidade</span></li>
+                <li><span class="ck">✓</span><span>Defina claramente entregas, prazos e número de revisões</span></li>
+              </ul>
+              <div class="highlight-row">
+                <div class="highlight-card hl-red">
+                  <h4>💰 Precificação</h4>
+                  <p>Base: R$50–R$100 por 1.000 seguidores. Vídeos longos: +50%. Pacote feed + stories + Reels: preço de pacote.</p>
+                </div>
+                <div class="highlight-card hl-purple">
+                  <h4>📋 Contrato</h4>
+                  <p>Documente: valor, pagamento, entregáveis, prazo de aprovação, direitos de imagem e cláusula de exclusividade.</p>
+                </div>
+                <div class="highlight-card hl-yellow">
+                  <h4>📄 Media Kit</h4>
+                  <p>Inclua: seguidores, taxa de engajamento, alcance médio, público-alvo (idade, gênero, localização) e publicações anteriores.</p>
+                </div>
+              </div>
+              <div class="tip-box">
+                🏆 <strong>Lembre-se:</strong> todo grande influenciador começou do zero. O que os diferencia é a consistência, não o talento nato.
+              </div>
+              <div class="module-actions">
+                <button class="btn-done" onclick="markDone('mod-6', this)">✓ Marcar como concluído</button>
+                <button class="btn-outline" onclick="toggleModule('mod-6')">Fechar módulo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BÔNUS -->
+    <div id="bonus">
+      <div class="section-title">🎁 Seus Bônus Exclusivos</div>
+      <div class="bonus-grid">
+        <div class="bonus-item">
+          <div class="b-icon">📋</div>
+          <h4>Media Kit Editável</h4>
+          <p>Template profissional no Canva para impressionar marcas</p>
+          <a href="#" class="btn-bonus">Acessar →</a>
+        </div>
+        <div class="bonus-item">
+          <div class="b-icon">📧</div>
+          <h4>Pack de E-mails</h4>
+          <p>15 templates prontos de abordagem e fechamento com marcas</p>
+          <a href="#" class="btn-bonus">Acessar →</a>
+        </div>
+        <div class="bonus-item">
+          <div class="b-icon">🗓️</div>
+          <h4>Calendário 90 dias</h4>
+          <p>Planilha completa com ideias de pauta por 3 meses</p>
+          <a href="#" class="btn-bonus">Acessar →</a>
+        </div>
+        <div class="bonus-item">
+          <div class="b-icon">🏷️</div>
+          <h4>Tabela de Preços</h4>
+          <p>Calculadora de preços por seguidores, nicho e formato</p>
+          <a href="#" class="btn-bonus">Acessar →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // ── SIDEBAR MOBILE ──
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebar-overlay').classList.add('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+  }
+  function setActive(el) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    closeSidebar();
+  }
+
+  // ── TOGGLE MODULE ──
+  function toggleModule(id) {
+    const row = document.getElementById(id);
+    row.classList.toggle('open');
+  }
+
+  // ── MARK DONE ──
+  let doneCount = 0;
+  function markDone(id, btn) {
+    const badge = document.getElementById('badge-' + id);
+    if (badge.classList.contains('done')) return;
+    badge.classList.remove('current', 'locked');
+    badge.classList.add('done');
+    badge.textContent = '✓ Concluído';
+    btn.textContent = '✓ Concluído!';
+    btn.disabled = true;
+    btn.style.opacity = '.6';
+    doneCount++;
+    updateProgress();
+    toggleModule(id);
+  }
+
+  function updateProgress() {
+    const pct = Math.round((doneCount / 6) * 100);
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('stat-done').textContent = doneCount + '/6';
+  }
+
+  // Anima barra de progresso ao carregar
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('progress-fill').style.width = '0%';
+    }, 300);
+  });
+</script>
+</body>
+</html>
