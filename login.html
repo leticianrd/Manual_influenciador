@@ -517,201 +517,141 @@
 
 <script type="module">
   import { supabase } from './supabase-client.js'
-  window._supabase = supabase
-  // ─── TABS ───
-  function switchTab(tab) {
-    const isLogin = tab === 'login';
-    document.getElementById('tab-login').classList.toggle('active', isLogin);
-    document.getElementById('tab-register').classList.toggle('active', !isLogin);
-    document.getElementById('panel-login').style.display = isLogin ? 'block' : 'none';
-    document.getElementById('panel-register').style.display = !isLogin ? 'block' : 'none';
-  }
+  // ─── REDIRECIONA SE JÁ ESTIVER LOGADO ───
+  const { data: { session: existingSession } } = await supabase.auth.getSession()
+  if (existingSession) window.location.href = 'dashboard.html'
 
-  // ─── TOGGLE PASSWORD VISIBILITY ───
-  function togglePwd(fieldId, btn) {
-    const input = document.getElementById(fieldId);
-    const isHidden = input.type === 'password';
-    input.type = isHidden ? 'text' : 'password';
-    btn.textContent = isHidden ? '🙈' : '👁️';
-  }
-
-  // ─── VALIDATIONS ───
-  function validateEmail(val) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-  }
-
+  // ─── HELPERS ───
+  function validateEmail(val) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) }
   function showError(inputId, hintId, msg) {
-    const input = document.getElementById(inputId);
-    const hint  = document.getElementById(hintId);
-    input.classList.add('error');
-    hint.textContent = msg;
-    hint.classList.add('visible');
-    return false;
+    const el = document.getElementById(inputId)
+    const hint = document.getElementById(hintId)
+    if (el) el.classList.add('error')
+    if (hint) { hint.textContent = msg; hint.classList.add('visible') }
   }
-
   function clearError(inputId, hintId) {
-    document.getElementById(inputId).classList.remove('error');
-    document.getElementById(hintId).classList.remove('visible');
+    const el = document.getElementById(inputId)
+    const hint = document.getElementById(hintId)
+    if (el) el.classList.remove('error')
+    if (hint) hint.classList.remove('visible')
   }
 
-  // ─── STRENGTH BAR ───
-  function checkStrength(pwd) {
-    const wrap = document.getElementById('strength-wrap');
-    wrap.style.display = pwd.length > 0 ? 'block' : 'none';
-
-    const rules = {
-      len:     pwd.length >= 8,
-      upper:   /[A-Z]/.test(pwd),
-      num:     /[0-9]/.test(pwd),
-      special: /[^A-Za-z0-9]/.test(pwd),
-    };
-
-    toggleRule('rule-len',     rules.len);
-    toggleRule('rule-upper',   rules.upper);
-    toggleRule('rule-num',     rules.num);
-    toggleRule('rule-special', rules.special);
-
-    const score = Object.values(rules).filter(Boolean).length;
-    const bars  = ['bar1','bar2','bar3','bar4'];
-    const label = document.getElementById('strength-label');
-    const levels = ['', 'weak', 'medium', 'strong', 'strong'];
-    const texts  = ['', 'Fraca', 'Média', 'Forte', 'Muito forte'];
-
-    bars.forEach((id, i) => {
-      const el = document.getElementById(id);
-      el.className = 'bar';
-      if (i < score) el.classList.add(levels[score]);
-    });
-    label.textContent = texts[score] ? `Senha ${texts[score]}` : '';
-    label.style.color = score <= 1 ? '#EF4444' : score === 2 ? '#FBBF24' : '#10B981';
+  // ─── TABS ───
+  window.switchTab = function(tab) {
+    const isLogin = tab === 'login'
+    document.getElementById('tab-login').classList.toggle('active', isLogin)
+    document.getElementById('tab-register').classList.toggle('active', !isLogin)
+    document.getElementById('panel-login').style.display = isLogin ? 'block' : 'none'
+    document.getElementById('panel-register').style.display = !isLogin ? 'block' : 'none'
   }
 
-  function toggleRule(id, ok) {
-    document.getElementById(id).classList.toggle('ok', ok);
+  // ─── TOGGLE SENHA ───
+  window.togglePwd = function(fieldId, btn) {
+    const input = document.getElementById(fieldId)
+    const isHidden = input.type === 'password'
+    input.type = isHidden ? 'text' : 'password'
+    btn.textContent = isHidden ? '🙈' : '👁️'
   }
 
-  function checkMatch() {
-    const pwd     = document.getElementById('reg-password').value;
-    const confirm = document.getElementById('reg-confirm').value;
-    if (confirm.length === 0) return;
-    if (pwd !== confirm) {
-      showError('reg-confirm', 'reg-confirm-hint', 'As senhas não coincidem.');
-    } else {
-      clearError('reg-confirm', 'reg-confirm-hint');
-    }
+  // ─── FORÇA DA SENHA ───
+  window.checkStrength = function(pwd) {
+    const wrap = document.getElementById('strength-wrap')
+    wrap.style.display = pwd.length > 0 ? 'block' : 'none'
+    const rules = { len: pwd.length >= 8, upper: /[A-Z]/.test(pwd), num: /[0-9]/.test(pwd), special: /[^A-Za-z0-9]/.test(pwd) }
+    ;['len','upper','num','special'].forEach(k => document.getElementById('rule-'+k).classList.toggle('ok', rules[k]))
+    const score = Object.values(rules).filter(Boolean).length
+    const levels = ['','weak','medium','strong','strong']
+    const texts = ['','Fraca','Média','Forte','Muito forte']
+    ;['bar1','bar2','bar3','bar4'].forEach((id, i) => {
+      const el = document.getElementById(id); el.className = 'bar'
+      if (i < score) el.classList.add(levels[score])
+    })
+    const label = document.getElementById('strength-label')
+    label.textContent = texts[score] ? `Senha ${texts[score]}` : ''
+    label.style.color = score <= 1 ? '#EF4444' : score === 2 ? '#FBBF24' : '#10B981'
   }
 
-  // ─── SUBMIT LOGIN ───
-  function submitLogin(e) {
-    e.preventDefault();
-    let valid = true;
-    const email = document.getElementById('login-email').value.trim();
-    const pwd   = document.getElementById('login-password').value;
-
-    clearError('login-email',    'login-email-hint');
-    clearError('login-password', 'login-password-hint');
-
-    if (!validateEmail(email)) {
-      showError('login-email', 'login-email-hint', 'Por favor, insira um e-mail válido.');
-      valid = false;
-    }
-    if (pwd.length < 1) {
-      showError('login-password', 'login-password-hint', 'Insira sua senha.');
-      valid = false;
-    }
-    if (!valid) return;
-
-    const btn = document.getElementById('login-btn');
-    btn.classList.add('loading');
-    const sb = window._supabase;
-    const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
-    btn.classList.remove('loading');
-    if (error) {
-      showError('login-email', 'login-email-hint', 'E-mail ou senha incorretos.');
-      showError('login-password', 'login-password-hint', ' ');
-      return;
-    }
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('login-success').style.display = 'block';
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+  window.checkMatch = function() {
+    const pwd = document.getElementById('reg-password').value
+    const confirm = document.getElementById('reg-confirm').value
+    if (!confirm.length) return
+    pwd !== confirm
+      ? showError('reg-confirm', 'reg-confirm-hint', 'As senhas não coincidem.')
+      : clearError('reg-confirm', 'reg-confirm-hint')
   }
 
-  // ─── SUBMIT REGISTER ───
-  function submitRegister(e) {
-    e.preventDefault();
-    let valid = true;
-    const name    = document.getElementById('reg-name').value.trim();
-    const email   = document.getElementById('reg-email').value.trim();
-    const pwd     = document.getElementById('reg-password').value;
-    const confirm = document.getElementById('reg-confirm').value;
-    const terms   = document.getElementById('reg-terms').checked;
-
-    ['reg-name','reg-email','reg-password','reg-confirm','reg-terms'].forEach(id => {
-      clearError(id, id + '-hint');
-    });
-
-    if (name.length < 2)        { showError('reg-name', 'reg-name-hint', 'Nome é obrigatório.'); valid = false; }
-    if (!validateEmail(email))  { showError('reg-email', 'reg-email-hint', 'Insira um e-mail válido.'); valid = false; }
-    if (pwd.length < 8)         { showError('reg-password', 'reg-password-hint', 'Senha deve ter pelo menos 8 caracteres.'); valid = false; }
-    if (pwd !== confirm)        { showError('reg-confirm', 'reg-confirm-hint', 'As senhas não coincidem.'); valid = false; }
-    if (!terms)                 { showError('reg-terms', 'reg-terms-hint', 'Você precisa aceitar os termos.'); valid = false; }
-    if (!valid) return;
-
-    const btn = document.getElementById('register-btn');
-    btn.classList.add('loading');
-    const sb = window._supabase;
-    const { error } = await sb.auth.signUp({
-      email,
-      password: pwd,
-      options: { data: { name } }
-    });
-    btn.classList.remove('loading');
-    if (error) {
-      showError('reg-email', 'reg-email-hint', error.message || 'Erro ao criar conta. Tente novamente.');
-      return;
-    }
-    document.getElementById('register-form').style.display = 'none';
-    document.getElementById('register-success').style.display = 'block';
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
-  }
-
-  // ─── FORGOT PASSWORD ───
-  function openForgot(e) {
-    e.preventDefault();
-    document.getElementById('forgot-modal').classList.add('open');
-  }
-  function closeForgot() {
-    document.getElementById('forgot-modal').classList.remove('open');
-  }
-  function submitForgot(e) {
-    e.preventDefault();
-    const email = document.getElementById('forgot-email').value.trim();
-    const hint  = document.getElementById('forgot-hint');
-    if (!validateEmail(email)) {
-      hint.classList.add('visible');
-      return;
-    }
-    hint.classList.remove('visible');
-    const btn = document.getElementById('forgot-btn');
-    btn.classList.add('loading');
-    const sb = window._supabase;
-    await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/login.html'
-    });
-    btn.classList.remove('loading');
-    btn.style.display = 'none';
-    document.getElementById('forgot-success').style.display = 'block';
-  }
-
-  // Fecha modal ao clicar fora
-  document.getElementById('forgot-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeForgot();
-  });
+  // ─── MODAL ESQUECI SENHA ───
+  window.openForgot = function(e) { e.preventDefault(); document.getElementById('forgot-modal').classList.add('open') }
+  window.closeForgot = function() { document.getElementById('forgot-modal').classList.remove('open') }
+  document.getElementById('forgot-modal').addEventListener('click', e => { if (e.target === document.getElementById('forgot-modal')) window.closeForgot() })
 
   // ─── SOCIAL LOGIN ───
-  function socialLogin(provider) {
-    alert(`Integração com ${provider} em breve! 🚀`);
-  }
+  window.socialLogin = function(provider) { alert(`Integração com ${provider} em breve! 🚀`) }
+
+  // ─── SUBMIT LOGIN ───
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const email = document.getElementById('login-email').value.trim()
+    const pwd   = document.getElementById('login-password').value
+    clearError('login-email', 'login-email-hint')
+    clearError('login-password', 'login-password-hint')
+    if (!validateEmail(email)) { showError('login-email', 'login-email-hint', 'Insira um e-mail válido.'); return }
+    if (!pwd) { showError('login-password', 'login-password-hint', 'Insira sua senha.'); return }
+
+    const btn = document.getElementById('login-btn')
+    btn.classList.add('loading')
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pwd })
+    btn.classList.remove('loading')
+    if (error) {
+      showError('login-email', 'login-email-hint', 'E-mail ou senha incorretos. Verifique seus dados.')
+      return
+    }
+    document.getElementById('login-form').style.display = 'none'
+    document.getElementById('login-success').style.display = 'block'
+    setTimeout(() => { window.location.href = 'dashboard.html' }, 1500)
+  })
+
+  // ─── SUBMIT CADASTRO ───
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const name    = document.getElementById('reg-name').value.trim()
+    const email   = document.getElementById('reg-email').value.trim()
+    const pwd     = document.getElementById('reg-password').value
+    const confirm = document.getElementById('reg-confirm').value
+    const terms   = document.getElementById('reg-terms').checked
+    let valid = true
+    ;['reg-name','reg-email','reg-password','reg-confirm','reg-terms'].forEach(id => clearError(id, id+'-hint'))
+    if (name.length < 2)       { showError('reg-name','reg-name-hint','Nome é obrigatório.'); valid=false }
+    if (!validateEmail(email)) { showError('reg-email','reg-email-hint','Insira um e-mail válido.'); valid=false }
+    if (pwd.length < 8)        { showError('reg-password','reg-password-hint','Mínimo 8 caracteres.'); valid=false }
+    if (pwd !== confirm)       { showError('reg-confirm','reg-confirm-hint','As senhas não coincidem.'); valid=false }
+    if (!terms)                { showError('reg-terms','reg-terms-hint','Aceite os termos para continuar.'); valid=false }
+    if (!valid) return
+
+    const btn = document.getElementById('register-btn')
+    btn.classList.add('loading')
+    const { error } = await supabase.auth.signUp({ email, password: pwd, options: { data: { name } } })
+    btn.classList.remove('loading')
+    if (error) { showError('reg-email','reg-email-hint', error.message || 'Erro ao criar conta.'); return }
+    document.getElementById('register-form').style.display = 'none'
+    document.getElementById('register-success').style.display = 'block'
+    setTimeout(() => { window.location.href = 'dashboard.html' }, 1500)
+  })
+
+  // ─── ESQUECI SENHA ───
+  document.getElementById('forgot-btn').closest('form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const email = document.getElementById('forgot-email').value.trim()
+    const hint = document.getElementById('forgot-hint')
+    if (!validateEmail(email)) { hint.classList.add('visible'); return }
+    hint.classList.remove('visible')
+    const btn = document.getElementById('forgot-btn')
+    btn.classList.add('loading')
+    await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/login.html' })
+    btn.classList.remove('loading')
+    btn.style.display = 'none'
+    document.getElementById('forgot-success').style.display = 'block'
+  })
 </script>
 </body>
 </html>
