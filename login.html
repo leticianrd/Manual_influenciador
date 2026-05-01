@@ -515,7 +515,9 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { supabase } from './supabase-client.js'
+  window._supabase = supabase
   // ─── TABS ───
   function switchTab(tab) {
     const isLogin = tab === 'login';
@@ -621,14 +623,17 @@
 
     const btn = document.getElementById('login-btn');
     btn.classList.add('loading');
-    setTimeout(() => {
-      btn.classList.remove('loading');
-      sessionStorage.setItem('ip_logado', 'true');
-      sessionStorage.setItem('ip_email', email);
-      document.getElementById('login-form').style.display = 'none';
-      document.getElementById('login-success').style.display = 'block';
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
-    }, 1800);
+    const sb = window._supabase;
+    const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+    btn.classList.remove('loading');
+    if (error) {
+      showError('login-email', 'login-email-hint', 'E-mail ou senha incorretos.');
+      showError('login-password', 'login-password-hint', ' ');
+      return;
+    }
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('login-success').style.display = 'block';
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
   }
 
   // ─── SUBMIT REGISTER ───
@@ -654,14 +659,20 @@
 
     const btn = document.getElementById('register-btn');
     btn.classList.add('loading');
-    setTimeout(() => {
-      btn.classList.remove('loading');
-      sessionStorage.setItem('ip_logado', 'true');
-      sessionStorage.setItem('ip_email', email);
-      document.getElementById('register-form').style.display = 'none';
-      document.getElementById('register-success').style.display = 'block';
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
-    }, 1800);
+    const sb = window._supabase;
+    const { error } = await sb.auth.signUp({
+      email,
+      password: pwd,
+      options: { data: { name } }
+    });
+    btn.classList.remove('loading');
+    if (error) {
+      showError('reg-email', 'reg-email-hint', error.message || 'Erro ao criar conta. Tente novamente.');
+      return;
+    }
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('register-success').style.display = 'block';
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
   }
 
   // ─── FORGOT PASSWORD ───
@@ -683,11 +694,13 @@
     hint.classList.remove('visible');
     const btn = document.getElementById('forgot-btn');
     btn.classList.add('loading');
-    setTimeout(() => {
-      btn.classList.remove('loading');
-      btn.style.display = 'none';
-      document.getElementById('forgot-success').style.display = 'block';
-    }, 1600);
+    const sb = window._supabase;
+    await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/login.html'
+    });
+    btn.classList.remove('loading');
+    btn.style.display = 'none';
+    document.getElementById('forgot-success').style.display = 'block';
   }
 
   // Fecha modal ao clicar fora

@@ -741,54 +741,83 @@
   </div>
 </main>
 
-<script>
+<script type="module">
   // ── PROTEÇÃO DE ACESSO ──
-  (function() {
-    if (!sessionStorage.getItem('ip_logado')) {
-      window.location.href = 'login.html';
-    }
-    const email = sessionStorage.getItem('ip_email') || '';
-    const name = email ? email.split('@')[0] : 'Aluno(a)';
-    const nameEl = document.querySelector('.user-name');
-    if (nameEl) nameEl.textContent = name;
-  })();
+  import { supabase } from './supabase-client.js'
+
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) { window.location.href = 'login.html' }
+
+  const user = session?.user
+  const name = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Aluno(a)'
+  const nameEl = document.querySelector('.user-name')
+  if (nameEl) nameEl.textContent = name
+
+  // ── LOGOUT ──
+  document.querySelector('.logout-btn').addEventListener('click', async () => {
+    await supabase.auth.signOut()
+    window.location.href = 'login.html'
+  })
+
+  // ── PROGRESSO NO SUPABASE ──
+  async function markDone(id, btn) {
+    const badge = document.getElementById('badge-' + id)
+    if (badge.classList.contains('done')) return
+    const moduleNum = parseInt(id.replace('mod-', ''))
+    await supabase.from('progress').upsert({
+      user_id: user.id, module_id: moduleNum, completed: true
+    })
+    badge.classList.remove('current','locked')
+    badge.classList.add('done')
+    badge.textContent = '✓ Concluído'
+    btn.textContent = '✓ Concluído!'
+    btn.disabled = true
+    btn.style.opacity = '.6'
+    doneCount++
+    updateProgress()
+    toggleModule(id)
+  }
+
+  // Carrega progresso salvo
+  const { data: savedProgress } = await supabase
+    .from('progress').select('module_id').eq('user_id', user.id).eq('completed', true)
+  if (savedProgress) {
+    savedProgress.forEach(p => {
+      const badge = document.getElementById('badge-mod-' + p.module_id)
+      if (badge) {
+        badge.classList.remove('current','locked')
+        badge.classList.add('done')
+        badge.textContent = '✓ Concluído'
+        doneCount++
+      }
+    })
+    updateProgress()
+  }
 
   // ── SIDEBAR MOBILE ──
-  function openSidebar() {
+  window.openSidebar = function() {
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('sidebar-overlay').classList.add('open');
   }
-  function closeSidebar() {
+  window.closeSidebar = function() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-overlay').classList.remove('open');
   }
-  function setActive(el) {
+  window.setActive = function(el) {
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
-    closeSidebar();
+    window.closeSidebar();
   }
 
   // ── TOGGLE MODULE ──
-  function toggleModule(id) {
+  window.toggleModule = function(id) {
     const row = document.getElementById(id);
     row.classList.toggle('open');
   }
+  window.markDone = markDone;
 
-  // ── MARK DONE ──
+  // ── MARK DONE (via Supabase acima) ──
   let doneCount = 0;
-  function markDone(id, btn) {
-    const badge = document.getElementById('badge-' + id);
-    if (badge.classList.contains('done')) return;
-    badge.classList.remove('current', 'locked');
-    badge.classList.add('done');
-    badge.textContent = '✓ Concluído';
-    btn.textContent = '✓ Concluído!';
-    btn.disabled = true;
-    btn.style.opacity = '.6';
-    doneCount++;
-    updateProgress();
-    toggleModule(id);
-  }
 
   function updateProgress() {
     const pct = Math.round((doneCount / 6) * 100);
