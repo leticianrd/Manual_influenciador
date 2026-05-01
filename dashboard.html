@@ -741,33 +741,42 @@
   </div>
 </main>
 
-<script type="module">
-  // ── PROTEÇÃO DE ACESSO ──
-  import { supabase } from './supabase-client.js'
+<!-- Script 1: UI — funções disponíveis imediatamente -->
+<script>
+  let doneCount = 0
 
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) { window.location.href = 'login.html' }
+  // ── SIDEBAR ──
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open')
+    document.getElementById('sidebar-overlay').classList.add('open')
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open')
+    document.getElementById('sidebar-overlay').classList.remove('open')
+  }
+  function setActive(el) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'))
+    el.classList.add('active')
+    closeSidebar()
+  }
 
-  const user = session?.user
-  const name = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Aluno(a)'
-  const nameEl = document.querySelector('.user-name')
-  if (nameEl) nameEl.textContent = name
+  // ── MÓDULOS ──
+  function toggleModule(id) {
+    document.getElementById(id).classList.toggle('open')
+  }
 
-  // ── LOGOUT ──
-  document.querySelector('.logout-btn').addEventListener('click', async () => {
-    await supabase.auth.signOut()
-    window.location.href = 'login.html'
-  })
+  // ── PROGRESSO ──
+  function updateProgress() {
+    const pct = Math.round((doneCount / 6) * 100)
+    document.getElementById('progress-pct').textContent = pct + '%'
+    document.getElementById('progress-fill').style.width = pct + '%'
+    document.getElementById('stat-done').textContent = doneCount + '/6'
+  }
 
-  // ── PROGRESSO NO SUPABASE ──
-  async function markDone(id, btn) {
+  function marcarConcluido(id, btn) {
     const badge = document.getElementById('badge-' + id)
-    if (badge.classList.contains('done')) return
-    const moduleNum = parseInt(id.replace('mod-', ''))
-    await supabase.from('progress').upsert({
-      user_id: user.id, module_id: moduleNum, completed: true
-    })
-    badge.classList.remove('current','locked')
+    if (!badge || badge.classList.contains('done')) return
+    badge.classList.remove('current', 'locked')
     badge.classList.add('done')
     badge.textContent = '✓ Concluído'
     btn.textContent = '✓ Concluído!'
@@ -778,14 +787,46 @@
     toggleModule(id)
   }
 
-  // Carrega progresso salvo
+  // markDone chama versão UI e depois sincroniza com Supabase
+  function markDone(id, btn) {
+    marcarConcluido(id, btn)
+    if (window._supabaseMarkDone) window._supabaseMarkDone(id)
+  }
+</script>
+
+<!-- Script 2: Supabase — auth e banco de dados -->
+<script type="module">
+  import { supabase } from './supabase-client.js'
+
+  // ── PROTEÇÃO: redireciona se não logado ──
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) { window.location.href = 'login.html'; return }
+
+  const user = session.user
+  const name = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Aluno(a)'
+  const nameEl = document.querySelector('.user-name')
+  if (nameEl) nameEl.textContent = name
+
+  // ── LOGOUT ──
+  document.querySelector('.logout-btn').addEventListener('click', async () => {
+    await supabase.auth.signOut()
+    window.location.href = 'login.html'
+  })
+
+  // ── SALVAR PROGRESSO NO BANCO ──
+  window._supabaseMarkDone = async (id) => {
+    const moduleNum = parseInt(id.replace('mod-', ''))
+    await supabase.from('progress').upsert({ user_id: user.id, module_id: moduleNum, completed: true })
+  }
+
+  // ── CARREGAR PROGRESSO SALVO ──
   const { data: savedProgress } = await supabase
     .from('progress').select('module_id').eq('user_id', user.id).eq('completed', true)
-  if (savedProgress) {
+  if (savedProgress?.length) {
     savedProgress.forEach(p => {
       const badge = document.getElementById('badge-mod-' + p.module_id)
-      if (badge) {
-        badge.classList.remove('current','locked')
+      if (badge && !badge.classList.contains('done')) {
+        badge.classList.remove('current', 'locked')
         badge.classList.add('done')
         badge.textContent = '✓ Concluído'
         doneCount++
@@ -793,45 +834,6 @@
     })
     updateProgress()
   }
-
-  // ── SIDEBAR MOBILE ──
-  window.openSidebar = function() {
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('sidebar-overlay').classList.add('open');
-  }
-  window.closeSidebar = function() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-overlay').classList.remove('open');
-  }
-  window.setActive = function(el) {
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    el.classList.add('active');
-    window.closeSidebar();
-  }
-
-  // ── TOGGLE MODULE ──
-  window.toggleModule = function(id) {
-    const row = document.getElementById(id);
-    row.classList.toggle('open');
-  }
-  window.markDone = markDone;
-
-  // ── MARK DONE (via Supabase acima) ──
-  let doneCount = 0;
-
-  function updateProgress() {
-    const pct = Math.round((doneCount / 6) * 100);
-    document.getElementById('progress-pct').textContent = pct + '%';
-    document.getElementById('progress-fill').style.width = pct + '%';
-    document.getElementById('stat-done').textContent = doneCount + '/6';
-  }
-
-  // Anima barra de progresso ao carregar
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.getElementById('progress-fill').style.width = '0%';
-    }, 300);
-  });
 </script>
 </body>
 </html>
