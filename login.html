@@ -623,6 +623,8 @@
     btn.classList.add('loading');
     setTimeout(() => {
       btn.classList.remove('loading');
+      sessionStorage.setItem('ip_logado', 'true');
+      sessionStorage.setItem('ip_email', email);
       document.getElementById('login-form').style.display = 'none';
       document.getElementById('login-success').style.display = 'block';
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
@@ -654,8 +656,11 @@
     btn.classList.add('loading');
     setTimeout(() => {
       btn.classList.remove('loading');
+      sessionStorage.setItem('ip_logado', 'true');
+      sessionStorage.setItem('ip_email', email);
       document.getElementById('register-form').style.display = 'none';
       document.getElementById('register-success').style.display = 'block';
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
     }, 1800);
   }
 

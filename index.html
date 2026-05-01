@@ -52,6 +52,13 @@
       box-shadow: 0 4px 20px rgba(124,58,237,.4);
     }
     .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,.6); }
+    .nav-entrar {
+      color: #fff; text-decoration: none; font-weight: 600; font-size: .85rem;
+      padding: 10px 18px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,.2);
+      transition: all .2s;
+    }
+    .nav-entrar:hover { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.06); }
 
     /* ─── HERO ─── */
     .hero {
@@ -461,7 +468,10 @@
 <!-- NAV -->
 <nav>
   <span class="nav-logo">✦ InfluencerPro</span>
-  <a href="login.html" class="nav-cta">Quero o Manual →</a>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="login.html" class="nav-entrar">Entrar</a>
+    <a href="login.html" class="nav-cta">Quero o Manual →</a>
+  </div>
 </nav>
 
 <!-- HERO -->

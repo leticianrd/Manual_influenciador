@@ -316,7 +316,7 @@
         <div class="user-plan">✦ Acesso completo</div>
       </div>
     </div>
-    <button class="logout-btn" onclick="window.location.href='login.html'">
+    <button class="logout-btn" onclick="sessionStorage.clear();window.location.href='login.html'">
       🚪 Sair da conta
     </button>
   </div>
@@ -742,6 +742,17 @@
 </main>
 
 <script>
+  // ── PROTEÇÃO DE ACESSO ──
+  (function() {
+    if (!sessionStorage.getItem('ip_logado')) {
+      window.location.href = 'login.html';
+    }
+    const email = sessionStorage.getItem('ip_email') || '';
+    const name = email ? email.split('@')[0] : 'Aluno(a)';
+    const nameEl = document.querySelector('.user-name');
+    if (nameEl) nameEl.textContent = name;
+  })();
+
   // ── SIDEBAR MOBILE ──
   function openSidebar() {
     document.getElementById('sidebar').classList.add('open');
